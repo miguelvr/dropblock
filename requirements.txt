@@ -1,0 +1,2 @@
+numpy
+torch==0.4.1
