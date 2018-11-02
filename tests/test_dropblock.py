@@ -11,11 +11,11 @@ def test_block_mask_no_overlap():
                          [0., 0., 0., 0., 0.],
                          [0., 0., 0., 0., 0.]])
 
-    expected = torch.tensor([[1., 1., 0., 0., 0.],
-                             [1., 1., 0., 1., 1.],
-                             [0., 0., 0., 1., 1.],
-                             [0., 0., 0., 0., 0.],
-                             [0., 0., 0., 0., 0.]])
+    expected = torch.tensor([[0., 0., 1., 1., 1.],
+                             [0., 0., 1., 0., 0.],
+                             [1., 1., 1., 0., 0.],
+                             [1., 1., 1., 1., 1.],
+                             [1., 1., 1., 1., 1.]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
@@ -30,11 +30,11 @@ def test_block_mask_overlap():
                          [0., 0., 0., 0., 0.],
                          [0., 0., 0., 0., 0.]])
 
-    expected = torch.tensor([[1., 1., 1., 0., 0.],
-                             [1., 1., 1., 1., 1.],
-                             [1., 1., 1., 1., 1.],
-                             [0., 0., 0., 1., 1.],
-                             [0., 0., 0., 0., 0.]])
+    expected = torch.tensor([[0., 0., 0., 1., 1.],
+                             [0., 0., 0., 0., 0.],
+                             [0., 0., 0., 0., 0.],
+                             [1., 1., 1., 0., 0.],
+                             [1., 1., 1., 1., 1.]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
