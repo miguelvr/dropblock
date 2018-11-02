@@ -25,6 +25,8 @@ class DropBlock(nn.Module):
         height, width = mask.shape
 
         non_zero_idxs = mask.nonzero()
+        nr_blocks = non_zero_idxs.shape[0]
+
         offsets = torch.stack(
             [
                 torch.arange(self.block_size).view(-1, 1).expand(self.block_size, self.block_size).reshape(-1),
@@ -33,7 +35,7 @@ class DropBlock(nn.Module):
         ).t()
 
         non_zero_idxs = non_zero_idxs.repeat(self.block_size ** 2, 1)
-        offsets = offsets.repeat(1, self.block_size).view(-1, 2)
+        offsets = offsets.repeat(1, nr_blocks).view(-1, 2)
 
         block_idxs = non_zero_idxs + offsets
         padded_mask = F.pad(mask, (0, self.block_size, 0, self.block_size))
