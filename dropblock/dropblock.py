@@ -8,6 +8,9 @@ class DropBlock(nn.Module):
     def __init__(self, drop_prob, block_size, feat_size):
         super(DropBlock, self).__init__()
 
+        assert feat_size > block_size, \
+            "block_size can't exceed feat_size"
+
         self.drop_prob = drop_prob
         self.block_size = block_size
         self.feat_size = feat_size
