@@ -3,7 +3,6 @@
 Implementation of [DropBlock: A regularization method for convolutional networks](https://arxiv.org/pdf/1810.12890.pdf) 
 in PyTorch.
 
-**WARNING**: This repo is still under development
 
 ## Usage
 
