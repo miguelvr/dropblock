@@ -26,6 +26,8 @@ but they should be equivalent in terms of performance:
  generates 1's with `drop_prob` instead of 1's with `keep_prob`
  - The block masks are generated from the top left corner, 
  instead of being generated form the centers
+    - Therefore we sample from the whole image, instead of the subset 
+    where the blocks will fit.
  
 ## Reference
 [Ghiasi et al., 2018] DropBlock: A regularization method for convolutional networks
