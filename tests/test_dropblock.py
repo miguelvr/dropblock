@@ -49,10 +49,10 @@ def test_forward_pass():
                                [1., 1., 1., 1., 1.],
                                [1., 1., 1., 1., 1.]])
 
-    x = torch.ones(10, 10, 5, 5)
+    db._compute_block_mask = mock.MagicMock(return_value=block_mask)
 
-    with mock.patch.object(db, '_compute_block_mask', return_value=block_mask):
-        h = db(x)
+    x = torch.ones(10, 10, 5, 5)
+    h = db(x)
 
     expected = block_mask * block_mask.numel() / block_mask.sum()
     expected = expected[None, None, :, :].expand_as(x)
