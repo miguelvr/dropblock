@@ -18,6 +18,6 @@ jobs:
       before_install:
       - pip install pytest pytest-cov
       install:
-      - pip setup.py install
+      - python setup.py install
       script:
       - pytest --cov dropblock --cov-report term-missing -v tests/
