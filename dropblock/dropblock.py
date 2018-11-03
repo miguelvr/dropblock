@@ -23,13 +23,14 @@ class DropBlock(nn.Module):
         assert x.dim() == 4, \
             "Expected input with 4 dimensions (bsize, channels, height, width)"
 
-        if self.training:
+        if not self.training:
             return x
         else:
-            mask = self.bernouli.sample((x.sample[-2], x.sample[-1]))
+            mask = self.bernouli.sample((x.shape[-2], x.shape[-1]))
             block_mask = self._compute_block_mask(mask)
             out = x * block_mask[None, None, :, :]
-            return out * block_mask.numel() / block_mask.sum()
+            out = out * block_mask.numel() / block_mask.sum()
+            return out
 
     def _compute_block_mask(self, mask):
         height, width = mask.shape
