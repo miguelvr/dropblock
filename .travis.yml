@@ -1,0 +1,23 @@
+language: python
+
+stages:
+  - lint check
+  - test
+
+cache: pip
+
+jobs:
+  include:
+    - stage: lint check
+      python: "3.6"
+      install: pip install flake8
+      script: flake8
+
+    - stage: test
+      python: "3.6"
+      before_install:
+      - pip install pytest pytest-cov
+      install:
+      - pip setup.py install
+      script:
+      - pytest --cov dropblock --cov-report term-missing -v tests/
