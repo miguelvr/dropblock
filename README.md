@@ -1,5 +1,8 @@
 # DropBlock
 
+![build](https://travis-ci.org/miguelvr/dropblock.png?branch=master)
+
+
 Implementation of [DropBlock: A regularization method for convolutional networks](https://arxiv.org/pdf/1810.12890.pdf) 
 in PyTorch.
 
