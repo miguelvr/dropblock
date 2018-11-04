@@ -1,23 +1,29 @@
 language: python
-
 stages:
-  - lint check
-  - test
-
+- quality-assurance
+- deploy
 cache: pip
-
 jobs:
   include:
-    - stage: lint check
-      python: "3.6"
-      install: pip install flake8
-      script: flake8
+  - stage: quality-assurance
+    python: '3.6'
+    install: pip install flake8
+    script: flake8
 
-    - stage: test
-      python: "3.6"
-      before_install:
-      - pip install pytest pytest-cov
-      install:
-      - python setup.py install
-      script:
-      - pytest --cov dropblock --cov-report term-missing -v tests/
+  - stage: quality-assurance
+    python: '3.6'
+    before_install:
+    - pip install pytest pytest-cov
+    install:
+    - python setup.py install
+    script:
+    - pytest --cov dropblock --cov-report term-missing -v tests/
+
+  - stage: deploy
+    deploy:
+      provider: pypi
+      user: miguelvr
+      password:
+        secure: aLLyyxugo8/vWN5fNhqfj3/XTXyEYjIXgDBEp7BotdT5l84K8vhTw9OlfT9lXTetQY6knB8Ot0j9opdRinWWSniypyKWQQ78TwTQdyEl7gIrClr8eBXMCVLlTiu2ymHC7hDIq5Z6HM6X8Dr2L4znDmxZ7fYFwhbUMHIHuWFjA+NpmqyTDULgoZ8sj8yvGDji4CrYZO2TPRbQEkKev3A8FC3yO447uxqCcD8d/kcdD+/Xq6JbwUyoDCGO0buCYqYDbM07jYBjpOwbmyk9xZC0usEGK75qihGhXRT2msRIY5RebxyDDO3srLfvr8N/2MU2MJPpymASi7ig+N6HUNAdo+6QBv1AcrGFlzrWfuWagYTtwMEsU5Jg3Xje2GJEU7PMgs4zOlyURyiliEZGHZh0UjdeQwPuklmbq/KUWvz2ykQKCYkBDFR0RwHD5+s68OOYb4dFP8oGVHsR/68XH0lq3BSaoQNVAfONcKNrtFwniYXDf/DFHY2hCtU9ZSGigxK+oVPOFqU4mtlwXcwBgS6rB3Ryhr9MUWDdXPdFJu3aJ1734EXBchuv1AEXm+1EBu0QkSSWXaIZvZiDpZlrqQjF6P9/uS2foOaIbcXFAnqc/8b1DQX/81B13T73iF5eceLYUVruBCryo4IWEhP4MDj8KCx5xvurlsRR+Cz2AaUbYHc=
+      on:
+      tags: true
