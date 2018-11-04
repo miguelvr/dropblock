@@ -42,5 +42,6 @@ but they should be equivalent in terms of performance:
 [Ghiasi et al., 2018] DropBlock: A regularization method for convolutional networks
 
 ## TODO
+- [ ] Scheduled DropBlock
 - [ ] Get benchmark numbers
 - [ ] Extend the concept for 3D images
