@@ -1,11 +1,11 @@
 import torch
-from dropblock import DropBlock
+from dropblock import DropBlock2D
 from unittest import mock
 
 
 # noinspection PyCallingNonCallable
 def test_block_mask_square_even():
-    db = DropBlock(block_size=2, drop_prob=0.1)
+    db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0., 0.],
                           [0., 0., 0., 1., 0.],
                           [0., 0., 0., 0., 0.],
@@ -25,7 +25,7 @@ def test_block_mask_square_even():
 
 
 def test_block_mask_Hw_even():
-    db = DropBlock(block_size=2, drop_prob=0.1)
+    db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0.],
                           [0., 0., 0., 1.],
                           [0., 0., 0., 0.],
@@ -45,7 +45,7 @@ def test_block_mask_Hw_even():
 
 
 def test_block_mask_hW_even():
-    db = DropBlock(block_size=2, drop_prob=0.1)
+    db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[0., 0., 0., 1., 0.],
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.],
@@ -64,7 +64,7 @@ def test_block_mask_hW_even():
 
 # noinspection PyCallingNonCallable
 def test_block_mask_square_odd():
-    db = DropBlock(block_size=3, drop_prob=0.1)
+    db = DropBlock2D(block_size=3, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0., 0.],
                           [0., 0., 0., 1., 0.],
                           [0., 0., 0., 0., 0.],
@@ -84,7 +84,7 @@ def test_block_mask_square_odd():
 
 
 def test_block_mask_Hw_odd():
-    db = DropBlock(block_size=3, drop_prob=0.1)
+    db = DropBlock2D(block_size=3, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0.],
                           [0., 0., 0., 1.],
                           [0., 0., 0., 0.],
@@ -104,7 +104,7 @@ def test_block_mask_Hw_odd():
 
 
 def test_block_mask_hW_odd():
-    db = DropBlock(block_size=3, drop_prob=0.1)
+    db = DropBlock2D(block_size=3, drop_prob=0.1)
     mask = torch.tensor([[[0., 0., 0., 1., 0.],
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.],
@@ -122,7 +122,7 @@ def test_block_mask_hW_odd():
 
 
 def test_forward_pass():
-    db = DropBlock(block_size=3, drop_prob=0.1)
+    db = DropBlock2D(block_size=3, drop_prob=0.1)
     block_mask = torch.tensor([[[0., 0., 0., 1., 1., 1., 1.],
                                 [0., 0., 0., 0., 0., 0., 1.],
                                 [0., 0., 0., 0., 0., 0., 1.],
