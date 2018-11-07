@@ -26,6 +26,7 @@ convolutional networks. On ImageNet classification, ResNet-50 architecture with
 DropBlock achieves 78.13% accuracy, which is more than 1.6% improvement on the baseline. 
 On COCO detection, DropBlock improves Average Precision of RetinaNet from 36.8% to 38.4%.
 
+
 ## Installation
 
 Install directly from PyPI:
