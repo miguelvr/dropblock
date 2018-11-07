@@ -5,6 +5,25 @@ from torch.distributions import Bernoulli
 
 
 class DropBlock2D(nn.Module):
+    r"""Randomly zeroes 2D spatial blocks of the input tensor.
+
+    As described in the paper
+    `DropBlock: A regularization method for convolutional networks`_ ,
+    dropping whole blocks of feature map allows to remove semantic
+    information as compared to regular dropout.
+
+    Args:
+        drop_prob (float): probability of an element to be dropped.
+        block_size (int): size of the block to drop
+
+    Shape:
+        - Input: `(N, C, H, W)`
+        - Output: `(N, C, H, W)`
+
+    .. _DropBlock: A regularization method for convolutional networks:
+       https://arxiv.org/abs/1810.12890
+
+    """
     def __init__(self, drop_prob, block_size):
         super(DropBlock2D, self).__init__()
 
@@ -58,6 +77,28 @@ class DropBlock2D(nn.Module):
 
 
 class DropBlock3D(DropBlock2D):
+    r"""Randomly zeroes 3D spatial blocks of the input tensor.
+
+    An extension to the concept described in the paper
+    `DropBlock: A regularization method for convolutional networks`_ ,
+    dropping whole blocks of feature map allows to remove semantic
+    information as compared to regular dropout.
+
+    Args:
+        drop_prob (float): probability of an element to be dropped.
+        block_size (int): size of the block to drop
+
+    Shape:
+        - Input: `(N, C, D, H, W)`
+        - Output: `(N, C, D, H, W)`
+
+    .. _DropBlock: A regularization method for convolutional networks:
+       https://arxiv.org/abs/1810.12890
+
+    """
+
+    def __init__(self, drop_prob, block_size):
+        super(DropBlock3D, self).__init__(drop_prob, block_size)
 
     def forward(self, x):
         # shape: (bsize, channels, depth, height, width)
