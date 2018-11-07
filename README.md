@@ -27,17 +27,10 @@ regularized_x = drop_block(x)
 
 ## Implementation details
 
-Some implementation details differ slightly from the description in the paper, 
-but they should be equivalent in terms of performance:
-
- - We use `drop_prob` instead of `keep_prob`
-    - Because of this decision, out bernoulli distribution 
- generates 1's with `drop_prob` instead of 1's with `keep_prob`
- - The block masks are generated from the top left corner, 
- instead of being generated form the centers
-    - Therefore we sample from the whole image, instead of the subset 
-    where the blocks will fit.
- 
+We use `drop_prob` instead of `keep_prob` as a matter of preference, 
+and to keep the argument consistent with pytorch's dropout. 
+Regardless, everything else should work similarly to what is described in the paper.
+  
 ## Reference
 [Ghiasi et al., 2018] DropBlock: A regularization method for convolutional networks
 
