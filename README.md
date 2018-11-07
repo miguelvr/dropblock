@@ -32,6 +32,10 @@ On COCO detection, DropBlock improves Average Precision of RetinaNet from 36.8% 
 Install directly from PyPI:
 
     pip install dropblock
+    
+or the bleeding edge version from github:
+
+    pip install git+https://github.com/miguelvr/dropblock.git#egg=dropblock
 
 ## Usage
 
