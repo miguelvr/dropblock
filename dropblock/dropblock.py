@@ -5,17 +5,11 @@ from torch.distributions import Bernoulli
 
 
 class DropBlock(nn.Module):
-    def __init__(self, drop_prob, block_size, feat_size):
+    def __init__(self, drop_prob, block_size):
         super(DropBlock, self).__init__()
-
-        assert feat_size > block_size, \
-            "block_size can't exceed feat_size"
 
         self.drop_prob = drop_prob
         self.block_size = block_size
-        self.feat_size = feat_size
-        self.gamma = self._compute_gamma()
-        self.bernouli = Bernoulli(self.gamma)
 
     def forward(self, x):
         # shape: (bsize, channels, height, width)
@@ -26,41 +20,38 @@ class DropBlock(nn.Module):
         if not self.training:
             return x
         else:
-            mask = self.bernouli.sample((x.shape[-2], x.shape[-1]))
+            # get gamma value
+            gamma = self._compute_gamma(feat_size=x.shape[1])
+
+            # sample from a mask
+            mask_reduction = self.block_size // 2
+            mask_height = x.shape[2] - mask_reduction
+            mask_width = x.shape[3] - mask_reduction
+            mask = Bernoulli(gamma).sample((x.shape[0], mask_height, mask_width))
+
+            # compute block mask
             block_mask = self._compute_block_mask(mask)
-            out = x * block_mask[None, None, :, :]
+
+            # apply block mask
+            out = x * block_mask[:, None, :, :]
+
+            # scale output
             out = out * block_mask.numel() / block_mask.sum()
+
             return out
 
     def _compute_block_mask(self, mask):
-        height, width = mask.shape
+        block_mask = F.conv2d(mask[:, None, :, :],
+                              torch.ones((mask.shape[0], 1, self.block_size, self.block_size)),
+                              padding=self.block_size // 2 + 1)
 
-        non_zero_idxs = mask.nonzero()
-        nr_blocks = non_zero_idxs.shape[0]
+        if self.block_size % 2 == 0:
+            block_mask = block_mask[:, :, 1:, 1:]
 
-        offsets = torch.stack(
-            [
-                torch.arange(self.block_size).view(-1, 1).expand(self.block_size, self.block_size).reshape(-1),
-                torch.arange(self.block_size).repeat(self.block_size)
-            ]
-        ).t()
+        block_mask = 1 - block_mask.squeeze(1)
 
-        non_zero_idxs = non_zero_idxs.repeat(self.block_size ** 2, 1)
-        offsets = offsets.repeat(1, nr_blocks).view(-1, 2)
+        return block_mask
 
-        block_idxs = non_zero_idxs + offsets
-        padded_mask = F.pad(mask, (0, self.block_size, 0, self.block_size))
-
-        padded_mask[block_idxs[:, 0], block_idxs[:, 1]] = 1.
-        block_mask = padded_mask[:height, :width]
-
-        return 1 - block_mask
-
-    def _compute_gamma(self):
+    def _compute_gamma(self, feat_size):
         return (self.drop_prob / (self.block_size ** 2)) * \
-               ((self.feat_size ** 2) / ((self.feat_size - self.block_size + 1) ** 2))
-
-    def set_drop_probability(self, drop_prob):
-        self.drop_prob = drop_prob
-        self.gamma = self._compute_gamma()
-        self.bernouli = Bernoulli(self.gamma)
+               ((feat_size ** 2) / ((feat_size - self.block_size + 1) ** 2))
