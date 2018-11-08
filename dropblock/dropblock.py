@@ -64,8 +64,14 @@ class DropBlock2D(nn.Module):
                               torch.ones((mask.shape[0], 1, self.block_size, self.block_size)),
                               padding=self.block_size // 2 + 1)
 
-        if self.block_size % 2 == 0:
-            block_mask = block_mask[:, :, 1:, 1:]
+        delta = self.block_size // 2
+        input_height = mask.shape[-2] + delta
+        input_width = mask.shape[-1] + delta
+
+        height_to_crop = block_mask.shape[-2] - input_height
+        width_to_crop = block_mask.shape[-1] - input_width
+
+        block_mask = block_mask[:, :, :-height_to_crop, :-width_to_crop]
 
         block_mask = 1 - block_mask.squeeze(1)
 
@@ -135,8 +141,16 @@ class DropBlock3D(DropBlock2D):
                               torch.ones((mask.shape[0], 1, self.block_size, self.block_size, self.block_size)),
                               padding=self.block_size // 2 + 1)
 
-        if self.block_size % 2 == 0:
-            block_mask = block_mask[:, :, 1:, 1:, 1:]
+        delta = self.block_size // 2
+        input_depth = mask.shape[-3] + delta
+        input_height = mask.shape[-2] + delta
+        input_width = mask.shape[-1] + delta
+
+        depth_to_crop = block_mask.shape[-3] - input_depth
+        height_to_crop = block_mask.shape[-2] - input_height
+        width_to_crop = block_mask.shape[-1] - input_width
+
+        block_mask = block_mask[:, :, :-depth_to_crop, :-height_to_crop, :-width_to_crop:]
 
         block_mask = 1 - block_mask.squeeze(1)
 
