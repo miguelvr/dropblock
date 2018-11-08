@@ -213,4 +213,3 @@ def test_forward_pass2():
     output = dropout(input)
 
     assert tuple(input.shape) == tuple(output.shape)
-
