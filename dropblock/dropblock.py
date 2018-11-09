@@ -25,6 +25,7 @@ class DropBlock2D(nn.Module):
        https://arxiv.org/abs/1810.12890
 
     """
+
     def __init__(self, drop_prob, block_size):
         super(DropBlock2D, self).__init__()
 
@@ -47,10 +48,20 @@ class DropBlock2D(nn.Module):
             mask_reduction = self.block_size // 2
             mask_height = x.shape[2] - mask_reduction
             mask_width = x.shape[3] - mask_reduction
-            mask = Bernoulli(gamma).sample((x.shape[0], mask_height, mask_width))
+            mask = Bernoulli(gamma).sample(
+                (x.shape[0], mask_height, mask_width))
+
+            # place mask on input device
+            mask = mask.to(x.device)
+
+            # create tensor of ones to convolve mask with
+            ones = torch.ones((1, 1, self.block_size, self.block_size))
+
+            # place ones on input device
+            ones = ones.to(x.device)
 
             # compute block mask
-            block_mask = self._compute_block_mask(mask)
+            block_mask = self._compute_block_mask(mask, ones)
 
             # apply block mask
             out = x * block_mask[:, None, :, :]
@@ -60,9 +71,9 @@ class DropBlock2D(nn.Module):
 
             return out
 
-    def _compute_block_mask(self, mask):
+    def _compute_block_mask(self, mask, ones):
         block_mask = F.conv2d(mask[:, None, :, :],
-                              torch.ones((1, 1, self.block_size, self.block_size)),
+                              ones,
                               padding=int(np.ceil(self.block_size / 2) + 1))
 
         delta = self.block_size // 2
@@ -84,7 +95,8 @@ class DropBlock2D(nn.Module):
 
     def _compute_gamma(self, feat_size):
         if feat_size < self.block_size:
-            raise ValueError('input.shape[1] can not be smaller than block_size')
+            raise ValueError(
+                'input.shape[1] can not be smaller than block_size')
 
         return (self.drop_prob / (self.block_size ** 2)) * \
                ((feat_size ** 2) / ((feat_size - self.block_size + 1) ** 2))
@@ -131,10 +143,21 @@ class DropBlock3D(DropBlock2D):
             mask_depth = x.shape[-3] - mask_reduction
             mask_height = x.shape[-2] - mask_reduction
             mask_width = x.shape[-1] - mask_reduction
-            mask = Bernoulli(gamma).sample((x.shape[0], mask_depth, mask_height, mask_width))
+            mask = Bernoulli(gamma).sample(
+                (x.shape[0], mask_depth, mask_height, mask_width))
+
+            # place mask on input device
+            mask = mask.to(x.device)
+
+            # create tensor of ones to convolve mask with
+            ones = torch.ones(
+                (1, 1, self.block_size, self.block_size, self.block_size))
+
+            # place ones on input device
+            ones = ones.to(x.device)
 
             # compute block mask
-            block_mask = self._compute_block_mask(mask)
+            block_mask = self._compute_block_mask(mask, ones)
 
             # apply block mask
             out = x * block_mask[:, None, :, :, :]
@@ -144,9 +167,9 @@ class DropBlock3D(DropBlock2D):
 
             return out
 
-    def _compute_block_mask(self, mask):
+    def _compute_block_mask(self, mask, ones):
         block_mask = F.conv3d(mask[:, None, :, :, :],
-                              torch.ones((1, 1, self.block_size, self.block_size, self.block_size)),
+                              ones,
                               padding=int(np.ceil(self.block_size // 2) + 1))
 
         delta = self.block_size // 2
