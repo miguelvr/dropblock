@@ -138,8 +138,13 @@ def test_forward_pass():
 
 
 def test_forward_pass2():
-    dropout = DropBlock2D(0.2, block_size=3)
-    input = torch.randn((1, 1, 8, 8))
-    output = dropout(input)
 
-    assert tuple(input.shape) == tuple(output.shape)
+    block_sizes = [2, 3, 4, 5, 6, 7, 8]
+    heights = [5, 6, 8, 10, 11, 14, 15]
+    widths = [5, 7, 8, 10, 15, 14, 15]
+
+    for block_size, height, width in zip(block_sizes, heights, widths):
+        dropout = DropBlock2D(0.1, block_size=block_size)
+        input = torch.randn((1, 20, height, width))
+        output = dropout(input)
+        assert tuple(input.shape) == tuple(output.shape)

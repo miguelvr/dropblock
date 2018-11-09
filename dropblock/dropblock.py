@@ -71,13 +71,17 @@ class DropBlock2D(nn.Module):
         height_to_crop = block_mask.shape[-2] - input_height
         width_to_crop = block_mask.shape[-1] - input_width
 
-        block_mask = block_mask[:, :, :-height_to_crop, :-width_to_crop]
+        if height_to_crop != 0 or width_to_crop != 0:
+            block_mask = block_mask[:, :, :-height_to_crop, :-width_to_crop]
 
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
 
     def _compute_gamma(self, feat_size):
+        if feat_size < self.block_size:
+            raise ValueError('input.shape[1] can not be smaller than block_size')
+
         return (self.drop_prob / (self.block_size ** 2)) * \
                ((feat_size ** 2) / ((feat_size - self.block_size + 1) ** 2))
 
@@ -150,7 +154,8 @@ class DropBlock3D(DropBlock2D):
         height_to_crop = block_mask.shape[-2] - input_height
         width_to_crop = block_mask.shape[-1] - input_width
 
-        block_mask = block_mask[:, :, :-depth_to_crop, :-height_to_crop, :-width_to_crop:]
+        if height_to_crop != 0 or width_to_crop != 0 or depth_to_crop !=0:
+            block_mask = block_mask[:, :, :-depth_to_crop, :-height_to_crop, :-width_to_crop:]
 
         block_mask = 1 - block_mask.squeeze(1)
 
