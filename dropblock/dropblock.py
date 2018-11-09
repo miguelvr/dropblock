@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -61,8 +62,8 @@ class DropBlock2D(nn.Module):
 
     def _compute_block_mask(self, mask):
         block_mask = F.conv2d(mask[:, None, :, :],
-                              torch.ones((mask.shape[0], 1, self.block_size, self.block_size)),
-                              padding=self.block_size // 2 + 1)
+                              torch.ones((1, 1, self.block_size, self.block_size)),
+                              padding=int(np.ceil(self.block_size / 2) + 1))
 
         delta = self.block_size // 2
         input_height = mask.shape[-2] + delta
@@ -71,8 +72,11 @@ class DropBlock2D(nn.Module):
         height_to_crop = block_mask.shape[-2] - input_height
         width_to_crop = block_mask.shape[-1] - input_width
 
-        if height_to_crop != 0 or width_to_crop != 0:
-            block_mask = block_mask[:, :, :-height_to_crop, :-width_to_crop]
+        if height_to_crop != 0:
+            block_mask = block_mask[:, :, :-height_to_crop, :]
+
+        if width_to_crop != 0:
+            block_mask = block_mask[:, :, :, :-width_to_crop]
 
         block_mask = 1 - block_mask.squeeze(1)
 
@@ -142,8 +146,8 @@ class DropBlock3D(DropBlock2D):
 
     def _compute_block_mask(self, mask):
         block_mask = F.conv3d(mask[:, None, :, :, :],
-                              torch.ones((mask.shape[0], 1, self.block_size, self.block_size, self.block_size)),
-                              padding=self.block_size // 2 + 1)
+                              torch.ones((1, 1, self.block_size, self.block_size, self.block_size)),
+                              padding=int(np.ceil(self.block_size // 2) + 1))
 
         delta = self.block_size // 2
         input_depth = mask.shape[-3] + delta
@@ -154,8 +158,14 @@ class DropBlock3D(DropBlock2D):
         height_to_crop = block_mask.shape[-2] - input_height
         width_to_crop = block_mask.shape[-1] - input_width
 
-        if height_to_crop != 0 or width_to_crop != 0 or depth_to_crop != 0:
-            block_mask = block_mask[:, :, :-depth_to_crop, :-height_to_crop, :-width_to_crop:]
+        if depth_to_crop != 0:
+            block_mask = block_mask[:, :, :-depth_to_crop, :, :]
+
+        if height_to_crop != 0:
+            block_mask = block_mask[:, :, :, :-height_to_crop, :]
+
+        if width_to_crop != 0:
+            block_mask = block_mask[:, :, :, :, :-width_to_crop]
 
         block_mask = 1 - block_mask.squeeze(1)
 

@@ -68,11 +68,11 @@ def test_block_mask_square_odd():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[0., 0., 0., 1., 1., 1.],
-                              [0., 0., 0., 0., 0., 0.],
-                              [0., 0., 0., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
+    expected = torch.tensor([[[1., 1., 1., 1., 1., 1.],
+                              [1., 0., 0., 0., 1., 1.],
+                              [1., 0., 0., 0., 0., 0.],
+                              [1., 0., 0., 0., 0., 0.],
+                              [1., 1., 1., 1., 0., 0.],
                               [1., 1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
@@ -87,11 +87,11 @@ def test_block_mask_Hw_odd():
                           [0., 0., 0., 0.],
                           [0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[0., 0., 0., 1., 1.],
-                              [0., 0., 0., 0., 0.],
-                              [0., 0., 0., 0., 0.],
-                              [1., 1., 1., 0., 0.],
-                              [1., 1., 1., 1., 1.],
+    expected = torch.tensor([[[1., 1., 1., 1., 1.],
+                              [1., 0., 0., 0., 1.],
+                              [1., 0., 0., 0., 0.],
+                              [1., 0., 0., 0., 0.],
+                              [1., 1., 1., 1., 0.],
                               [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
@@ -105,10 +105,10 @@ def test_block_mask_hW_odd():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
+    expected = torch.tensor([[[1., 1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 0., 0.],
+                              [1., 1., 1., 1., 0., 0.],
+                              [1., 1., 1., 1., 0., 0.],
                               [1., 1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
@@ -145,6 +145,10 @@ def test_forward_pass2():
 
     for block_size, height, width in zip(block_sizes, heights, widths):
         dropout = DropBlock2D(0.1, block_size=block_size)
-        input = torch.randn((1, 20, height, width))
+        input = torch.randn((5, 20, height, width))
         output = dropout(input)
         assert tuple(input.shape) == tuple(output.shape)
+
+
+if __name__ == '__main__':
+    test_block_mask_Hw_odd()
