@@ -154,7 +154,7 @@ class DropBlock3D(DropBlock2D):
         height_to_crop = block_mask.shape[-2] - input_height
         width_to_crop = block_mask.shape[-1] - input_width
 
-        if height_to_crop != 0 or width_to_crop != 0 or depth_to_crop !=0:
+        if height_to_crop != 0 or width_to_crop != 0 or depth_to_crop != 0:
             block_mask = block_mask[:, :, :-depth_to_crop, :-height_to_crop, :-width_to_crop:]
 
         block_mask = 1 - block_mask.squeeze(1)
