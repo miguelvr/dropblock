@@ -215,7 +215,7 @@ def test_forward_pass2():
 
     for block_size, depth, height, width in zip(block_sizes, depths, heights, widths):
         dropout = DropBlock3D(0.2, block_size=block_size)
-        input = torch.randn((1, 20, depth, height, width))
+        input = torch.randn((5, 20, depth, height, width))
         output = dropout(input)
 
         assert tuple(input.shape) == tuple(output.shape)
