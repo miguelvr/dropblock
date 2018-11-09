@@ -54,14 +54,8 @@ class DropBlock2D(nn.Module):
             # place mask on input device
             mask = mask.to(x.device)
 
-            # create tensor of ones to convolve mask with
-            ones = torch.ones((1, 1, self.block_size, self.block_size))
-
-            # place ones on input device
-            ones = ones.to(x.device)
-
             # compute block mask
-            block_mask = self._compute_block_mask(mask, ones)
+            block_mask = self._compute_block_mask(mask)
 
             # apply block mask
             out = x * block_mask[:, None, :, :]
@@ -71,9 +65,10 @@ class DropBlock2D(nn.Module):
 
             return out
 
-    def _compute_block_mask(self, mask, ones):
+    def _compute_block_mask(self, mask):
         block_mask = F.conv2d(mask[:, None, :, :],
-                              ones,
+                              torch.ones((1, 1, self.block_size, self.block_size)).to(
+                                  mask.device),
                               padding=int(np.ceil(self.block_size / 2) + 1))
 
         delta = self.block_size // 2
@@ -149,15 +144,8 @@ class DropBlock3D(DropBlock2D):
             # place mask on input device
             mask = mask.to(x.device)
 
-            # create tensor of ones to convolve mask with
-            ones = torch.ones(
-                (1, 1, self.block_size, self.block_size, self.block_size))
-
-            # place ones on input device
-            ones = ones.to(x.device)
-
             # compute block mask
-            block_mask = self._compute_block_mask(mask, ones)
+            block_mask = self._compute_block_mask(mask)
 
             # apply block mask
             out = x * block_mask[:, None, :, :, :]
@@ -167,9 +155,10 @@ class DropBlock3D(DropBlock2D):
 
             return out
 
-    def _compute_block_mask(self, mask, ones):
+    def _compute_block_mask(self, mask):
         block_mask = F.conv3d(mask[:, None, :, :, :],
-                              ones,
+                              torch.ones((1, 1, self.block_size, self.block_size, self.block_size)).to(
+                                  mask.device),
                               padding=int(np.ceil(self.block_size // 2) + 1))
 
         delta = self.block_size // 2
