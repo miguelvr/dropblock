@@ -84,6 +84,7 @@ class DropBlock2D(nn.Module):
         if width_to_crop != 0:
             block_mask = block_mask[:, :, :, :-width_to_crop]
 
+        block_mask = (block_mask >= 1).to(device=block_mask.device, dtype=block_mask.dtype)
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
@@ -179,6 +180,7 @@ class DropBlock3D(DropBlock2D):
         if width_to_crop != 0:
             block_mask = block_mask[:, :, :, :, :-width_to_crop]
 
+        block_mask = (block_mask >= 1).to(device=block_mask.device, dtype=block_mask.dtype)
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
