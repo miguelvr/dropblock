@@ -41,15 +41,21 @@ class DropBlock2D(nn.Module):
         if not self.training or self.drop_prob == 0.:
             return x
         else:
-            # get gamma value
-            gamma = self._compute_gamma(feat_size=x.shape[1])
-
             # sample from a mask
             mask_reduction = self.block_size // 2
-            mask_height = x.shape[2] - mask_reduction
-            mask_width = x.shape[3] - mask_reduction
-            mask = Bernoulli(gamma).sample(
-                (x.shape[0], mask_height, mask_width))
+            mask_height = x.shape[-2] - mask_reduction
+            mask_width = x.shape[-1] - mask_reduction
+            mask_sizes = [mask_height, mask_width]
+
+            if any([x <= 0 for x in mask_sizes]):
+                raise ValueError('Input of shape {} is too small for block_size {}'
+                                 .format(tuple(x.shape), self.block_size))
+
+            # get gamma value
+            gamma = self._compute_gamma(x, mask_sizes)
+
+            # sample mask
+            mask = Bernoulli(gamma).sample((x.shape[0], *mask_sizes))
 
             # place mask on input device
             mask = mask.to(x.device)
@@ -89,13 +95,10 @@ class DropBlock2D(nn.Module):
 
         return block_mask
 
-    def _compute_gamma(self, feat_size):
-        if feat_size < self.block_size:
-            raise ValueError(
-                'input.shape[1] can not be smaller than block_size')
-
-        return (self.drop_prob / (self.block_size ** 2)) * \
-               ((feat_size ** 2) / ((feat_size - self.block_size + 1) ** 2))
+    def _compute_gamma(self, x, mask_sizes):
+        feat_area = x.shape[-2] * x.shape[-1]
+        mask_area = mask_sizes[-2] * mask_sizes[-1]
+        return (self.drop_prob / (self.block_size ** 2)) * (feat_area / mask_area)
 
 
 class DropBlock3D(DropBlock2D):
@@ -131,16 +134,21 @@ class DropBlock3D(DropBlock2D):
         if not self.training or self.drop_prob == 0.:
             return x
         else:
-            # get gamma value
-            gamma = self._compute_gamma(feat_size=x.shape[1])
-
-            # sample from a mask
             mask_reduction = self.block_size // 2
             mask_depth = x.shape[-3] - mask_reduction
             mask_height = x.shape[-2] - mask_reduction
             mask_width = x.shape[-1] - mask_reduction
-            mask = Bernoulli(gamma).sample(
-                (x.shape[0], mask_depth, mask_height, mask_width))
+            mask_sizes = [mask_depth, mask_height, mask_width]
+
+            if any([x <= 0 for x in mask_sizes]):
+                raise ValueError('Input of shape {} is too small for block_size {}'
+                                 .format(tuple(x.shape), self.block_size))
+
+            # get gamma value
+            gamma = self._compute_gamma(x, mask_sizes)
+
+            # sample mask
+            mask = Bernoulli(gamma).sample((x.shape[0], *mask_sizes))
 
             # place mask on input device
             mask = mask.to(x.device)
@@ -184,3 +192,8 @@ class DropBlock3D(DropBlock2D):
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
+
+    def _compute_gamma(self, x, mask_sizes):
+        feat_volume = x.shape[-3] * x.shape[-2] * x.shape[-1]
+        mask_volume = mask_sizes[-3] * mask_sizes[-2] * mask_sizes[-1]
+        return (self.drop_prob / (self.block_size ** 3)) * (feat_volume / mask_volume)
