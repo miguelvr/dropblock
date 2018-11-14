@@ -97,7 +97,9 @@ The drop probabilities will be:
 ```
 
 The user should include the `step()` call at the start of the batch loop, 
-or at the the start of a model's `forward` call. Check [examples/resnet-cifar10.py](examples/resnet-cifar10.py) to
+or at the the start of a model's `forward` call. 
+
+Check [examples/resnet-cifar10.py](examples/resnet-cifar10.py) to
 see an implementation example.
 
 ## Implementation details
