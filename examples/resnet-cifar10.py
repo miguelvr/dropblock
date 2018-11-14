@@ -114,11 +114,6 @@ if __name__ == '__main__':
     device = 'cpu' if options.device is None \
         else torch.device('cuda:{}'.format(options.device))
 
-    torch.manual_seed(42)
-    np.random.seed(42)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.RandomCrop(32, padding=4),
