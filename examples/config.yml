@@ -1,0 +1,7 @@
+root: ./data
+workers: 4
+bsize: 256
+epochs: 50
+lr: 0.001
+drop_prob: 0.
+block_size: 5
