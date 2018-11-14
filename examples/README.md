@@ -1,5 +1,14 @@
 # ResNet9 on CIFAR-10
 
+
+## Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
 Run the example on the CPU:
 
 ```bash
