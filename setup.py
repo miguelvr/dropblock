@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='dropblock',
-    version='0.2.0rc2',
+    version='0.2.0',
     packages=find_packages(),
     install_requires=required,
     url='https://github.com/miguelvr/dropblock',
