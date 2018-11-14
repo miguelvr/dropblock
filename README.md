@@ -66,16 +66,56 @@ drop_block = DropBlock3D(block_size=3, drop_prob=0.3)
 regularized_x = drop_block(x)
 ```
 
+Scheduled Dropblock:
+
+```python
+import torch
+from dropblock import DropBlock2D, LinearScheduler
+
+# (bsize, n_feats, depth, height, width)
+loader = [torch.rand(20, 10, 16, 16) for _ in range(10)]
+
+drop_block = LinearScheduler(
+                DropBlock2D(block_size=3, drop_prob=0.),
+                start_value=0.,
+                stop_value=0.25,
+                nr_steps=5
+            )
+
+probs = []
+for x in loader:
+    drop_block.step()
+    regularized_x = drop_block(x)
+    probs.append(drop_block.dropblock.drop_prob)
+    
+print(probs)
+```
+
+The drop probabilities will be:
+```
+>>> [0.    , 0.0625, 0.125 , 0.1875, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+```
+
+The user should include the `step()` call at the start of the batch loop, 
+or at the the start of a model's `forward` call. 
+
+Check [examples/resnet-cifar10.py](examples/resnet-cifar10.py) to
+see an implementation example.
+
 ## Implementation details
 
 We use `drop_prob` instead of `keep_prob` as a matter of preference, 
 and to keep the argument consistent with pytorch's dropout. 
 Regardless, everything else should work similarly to what is described in the paper.
-  
+
+## Benchmark
+
+Refer to [BENCHMARK.md](BENCHMARK.md)
+
 ## Reference
 [Ghiasi et al., 2018] DropBlock: A regularization method for convolutional networks
 
 ## TODO
-- [ ] Scheduled DropBlock
-- [ ] Get benchmark numbers
+- [x] Scheduled DropBlock
+- [x] Get benchmark numbers
 - [x] Extend the concept for 3D images
