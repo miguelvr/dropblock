@@ -75,7 +75,7 @@ class DropBlock2D(nn.Module):
         block_mask = F.conv2d(mask[:, None, :, :],
                               torch.ones((1, 1, self.block_size, self.block_size)).to(
                                   mask.device),
-                              padding=int(np.ceil(self.block_size / 2) + 1))
+                              padding=int(np.ceil(self.block_size // 2) + 1))
 
         delta = self.block_size // 2
         input_height = mask.shape[-2] + delta
