@@ -37,6 +37,8 @@ or the bleeding edge version from github:
 
     pip install git+https://github.com/miguelvr/dropblock.git#egg=dropblock
 
+**NOTE**: Implementation and tests were done in Python 3.6, if you have problems with other versions of python please open an issue.
+
 ## Usage
 
 
