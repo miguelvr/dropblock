@@ -1,13 +1,18 @@
 from setuptools import setup, find_packages
 
 
-with open('requirements.txt') as f:
+with open('requirements.txt', encoding='utf-8') as f:
     required = f.read().splitlines()
+
+with open('README.md', encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='dropblock',
-    version='0.2.1',
+    version='0.3.0',
     packages=find_packages(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=required,
     url='https://github.com/miguelvr/dropblock',
     license='MIT',
