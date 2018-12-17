@@ -1,6 +1,9 @@
-import torch
-from dropblock import DropBlock2D
 from unittest import mock
+
+import pytest
+import torch
+
+from dropblock import DropBlock2D
 
 
 # noinspection PyCallingNonCallable
@@ -12,17 +15,17 @@ def test_block_mask_square_even():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 1., 1., 1.],
-                              [1., 0., 0., 1., 1., 1.],
-                              [1., 0., 0., 1., 0., 0.],
-                              [1., 1., 1., 1., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[0., 0., 1., 1., 1.],
+                              [0., 0., 1., 0., 0.],
+                              [1., 1., 1., 0., 0.],
+                              [1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_block_mask_Hw_even():
     db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0.],
@@ -31,17 +34,17 @@ def test_block_mask_Hw_even():
                           [0., 0., 0., 0.],
                           [0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 1., 1.],
-                              [1., 0., 0., 1., 1.],
-                              [1., 0., 0., 1., 0.],
-                              [1., 1., 1., 1., 0.],
-                              [1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[0., 0., 1., 1.],
+                              [0., 0., 1., 0.],
+                              [1., 1., 1., 0.],
+                              [1., 1., 1., 1.],
+                              [1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_block_mask_hW_even():
     db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[0., 0., 0., 1., 0.],
@@ -49,11 +52,10 @@ def test_block_mask_hW_even():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 0., 0.],
-                              [1., 1., 1., 1., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[1., 1., 1., 0., 0.],
+                              [1., 1., 1., 0., 0.],
+                              [1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
@@ -68,17 +70,17 @@ def test_block_mask_square_odd():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[0., 0., 0., 1., 1., 1.],
-                              [0., 0., 0., 0., 0., 0.],
-                              [0., 0., 0., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[0., 0., 0., 0., 0.],
+                              [0., 0., 0., 0., 0.],
+                              [1., 1., 0., 0., 0.],
+                              [1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_block_mask_Hw_odd():
     db = DropBlock2D(block_size=3, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0.],
@@ -87,17 +89,17 @@ def test_block_mask_Hw_odd():
                           [0., 0., 0., 0.],
                           [0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[0., 0., 0., 1., 1.],
-                              [0., 0., 0., 0., 0.],
-                              [0., 0., 0., 0., 0.],
-                              [1., 1., 1., 0., 0.],
-                              [1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[0., 0., 0., 0.],
+                              [0., 0., 0., 0.],
+                              [1., 1., 0., 0.],
+                              [1., 1., 1., 1.],
+                              [1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_block_mask_hW_odd():
     db = DropBlock2D(block_size=3, drop_prob=0.1)
     mask = torch.tensor([[[0., 0., 0., 1., 0.],
@@ -105,16 +107,16 @@ def test_block_mask_hW_odd():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 0., 0., 0.],
-                              [1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[1., 1., 0., 0., 0.],
+                              [1., 1., 0., 0., 0.],
+                              [1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_block_mask_overlap():
     db = DropBlock2D(block_size=2, drop_prob=0.1)
     mask = torch.tensor([[[1., 0., 0., 0., 0.],
@@ -123,17 +125,17 @@ def test_block_mask_overlap():
                           [0., 0., 0., 0., 0.],
                           [0., 0., 0., 0., 0.]]])
 
-    expected = torch.tensor([[[1., 1., 1., 1., 1., 1.],
-                              [1., 0., 0., 1., 1., 1.],
-                              [1., 0., 0., 0., 1., 1.],
-                              [1., 1., 0., 0., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.],
-                              [1., 1., 1., 1., 1., 1.]]])
+    expected = torch.tensor([[[0., 0., 1., 1., 1.],
+                              [0., 0., 0., 1., 1.],
+                              [1., 0., 0., 1., 1.],
+                              [1., 1., 1., 1., 1.],
+                              [1., 1., 1., 1., 1.]]])
 
     block_mask = db._compute_block_mask(mask)
     assert torch.equal(block_mask, expected)
 
 
+# noinspection PyCallingNonCallable
 def test_forward_pass():
     db = DropBlock2D(block_size=3, drop_prob=0.1)
     block_mask = torch.tensor([[[0., 0., 0., 1., 1., 1., 1.],
@@ -169,5 +171,18 @@ def test_forward_pass2():
         assert tuple(input.shape) == tuple(output.shape)
 
 
-if __name__ == '__main__':
-    test_block_mask_hW_odd()
+def test_large_block_size():
+    dropout = DropBlock2D(0.3, block_size=9)
+    x = torch.rand(100, 10, 16, 16)
+    output = dropout(x)
+
+    assert tuple(x.shape) == tuple(output.shape)
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
+def test_forward_pass_with_cuda():
+    dropout = DropBlock2D(0.3, block_size=5).to('cuda')
+    x = torch.rand(100, 10, 16, 16).to('cuda')
+    output = dropout(x)
+
+    assert tuple(x.shape) == tuple(output.shape)

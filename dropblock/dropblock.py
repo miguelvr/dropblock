@@ -1,5 +1,3 @@
-import numpy as np
-import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.distributions import Bernoulli
@@ -41,21 +39,11 @@ class DropBlock2D(nn.Module):
         if not self.training or self.drop_prob == 0.:
             return x
         else:
-            # sample from a mask
-            mask_reduction = self.block_size // 2
-            mask_height = x.shape[-2] - mask_reduction
-            mask_width = x.shape[-1] - mask_reduction
-            mask_sizes = [mask_height, mask_width]
-
-            if any([x <= 0 for x in mask_sizes]):
-                raise ValueError('Input of shape {} is too small for block_size {}'
-                                 .format(tuple(x.shape), self.block_size))
-
             # get gamma value
-            gamma = self._compute_gamma(x, mask_sizes)
+            gamma = self._compute_gamma(x)
 
             # sample mask
-            mask = Bernoulli(gamma).sample((x.shape[0], *mask_sizes))
+            mask = Bernoulli(gamma).sample((x.shape[0], *x.shape[2:]))
 
             # place mask on input device
             mask = mask.to(x.device)
@@ -72,33 +60,20 @@ class DropBlock2D(nn.Module):
             return out
 
     def _compute_block_mask(self, mask):
-        block_mask = F.conv2d(mask[:, None, :, :],
-                              torch.ones((1, 1, self.block_size, self.block_size)).to(
-                                  mask.device),
-                              padding=int(np.ceil(self.block_size // 2) + 1))
+        block_mask = F.max_pool2d(input=mask[:, None, :, :],
+                                  kernel_size=(self.block_size, self.block_size),
+                                  stride=(1, 1),
+                                  padding=self.block_size // 2)
 
-        delta = self.block_size // 2
-        input_height = mask.shape[-2] + delta
-        input_width = mask.shape[-1] + delta
+        if self.block_size % 2 == 0:
+            block_mask = block_mask[:, :, :-1, :-1]
 
-        height_to_crop = block_mask.shape[-2] - input_height
-        width_to_crop = block_mask.shape[-1] - input_width
-
-        if height_to_crop != 0:
-            block_mask = block_mask[:, :, :-height_to_crop, :]
-
-        if width_to_crop != 0:
-            block_mask = block_mask[:, :, :, :-width_to_crop]
-
-        block_mask = (block_mask >= 1).to(device=block_mask.device, dtype=block_mask.dtype)
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
 
-    def _compute_gamma(self, x, mask_sizes):
-        feat_area = x.shape[-2] * x.shape[-1]
-        mask_area = mask_sizes[-2] * mask_sizes[-1]
-        return (self.drop_prob / (self.block_size ** 2)) * (feat_area / mask_area)
+    def _compute_gamma(self, x):
+        return self.drop_prob / (self.block_size ** 2)
 
 
 class DropBlock3D(DropBlock2D):
@@ -134,21 +109,11 @@ class DropBlock3D(DropBlock2D):
         if not self.training or self.drop_prob == 0.:
             return x
         else:
-            mask_reduction = self.block_size // 2
-            mask_depth = x.shape[-3] - mask_reduction
-            mask_height = x.shape[-2] - mask_reduction
-            mask_width = x.shape[-1] - mask_reduction
-            mask_sizes = [mask_depth, mask_height, mask_width]
-
-            if any([x <= 0 for x in mask_sizes]):
-                raise ValueError('Input of shape {} is too small for block_size {}'
-                                 .format(tuple(x.shape), self.block_size))
-
             # get gamma value
-            gamma = self._compute_gamma(x, mask_sizes)
+            gamma = self._compute_gamma(x)
 
             # sample mask
-            mask = Bernoulli(gamma).sample((x.shape[0], *mask_sizes))
+            mask = Bernoulli(gamma).sample((x.shape[0], *x.shape[2:]))
 
             # place mask on input device
             mask = mask.to(x.device)
@@ -165,35 +130,17 @@ class DropBlock3D(DropBlock2D):
             return out
 
     def _compute_block_mask(self, mask):
-        block_mask = F.conv3d(mask[:, None, :, :, :],
-                              torch.ones((1, 1, self.block_size, self.block_size, self.block_size)).to(
-                                  mask.device),
-                              padding=int(np.ceil(self.block_size // 2) + 1))
+        block_mask = F.max_pool3d(input=mask[:, None, :, :, :],
+                                  kernel_size=(self.block_size, self.block_size, self.block_size),
+                                  stride=(1, 1, 1),
+                                  padding=self.block_size // 2)
 
-        delta = self.block_size // 2
-        input_depth = mask.shape[-3] + delta
-        input_height = mask.shape[-2] + delta
-        input_width = mask.shape[-1] + delta
+        if self.block_size % 2 == 0:
+            block_mask = block_mask[:, :, :-1, :-1, :-1]
 
-        depth_to_crop = block_mask.shape[-3] - input_depth
-        height_to_crop = block_mask.shape[-2] - input_height
-        width_to_crop = block_mask.shape[-1] - input_width
-
-        if depth_to_crop != 0:
-            block_mask = block_mask[:, :, :-depth_to_crop, :, :]
-
-        if height_to_crop != 0:
-            block_mask = block_mask[:, :, :, :-height_to_crop, :]
-
-        if width_to_crop != 0:
-            block_mask = block_mask[:, :, :, :, :-width_to_crop]
-
-        block_mask = (block_mask >= 1).to(device=block_mask.device, dtype=block_mask.dtype)
         block_mask = 1 - block_mask.squeeze(1)
 
         return block_mask
 
-    def _compute_gamma(self, x, mask_sizes):
-        feat_volume = x.shape[-3] * x.shape[-2] * x.shape[-1]
-        mask_volume = mask_sizes[-3] * mask_sizes[-2] * mask_sizes[-1]
-        return (self.drop_prob / (self.block_size ** 3)) * (feat_volume / mask_volume)
+    def _compute_gamma(self, x):
+        return self.drop_prob / (self.block_size ** 3)
