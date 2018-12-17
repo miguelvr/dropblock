@@ -1,6 +1,6 @@
+import torch
 import torch.nn.functional as F
 from torch import nn
-from torch.distributions import Bernoulli
 
 
 class DropBlock2D(nn.Module):
@@ -43,7 +43,7 @@ class DropBlock2D(nn.Module):
             gamma = self._compute_gamma(x)
 
             # sample mask
-            mask = Bernoulli(gamma).sample((x.shape[0], *x.shape[2:]))
+            mask = (torch.rand(x.shape[0], *x.shape[2:]) < gamma).float()
 
             # place mask on input device
             mask = mask.to(x.device)
@@ -113,7 +113,7 @@ class DropBlock3D(DropBlock2D):
             gamma = self._compute_gamma(x)
 
             # sample mask
-            mask = Bernoulli(gamma).sample((x.shape[0], *x.shape[2:]))
+            mask = (torch.rand(x.shape[0], *x.shape[2:]) < gamma).float()
 
             # place mask on input device
             mask = mask.to(x.device)
