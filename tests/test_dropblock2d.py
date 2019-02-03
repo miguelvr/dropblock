@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 
 import pytest
@@ -136,6 +137,7 @@ def test_block_mask_overlap():
 
 
 # noinspection PyCallingNonCallable
+@pytest.mark.skipif(os.environ.get('PYTORCH_JIT', '1') == '1', reason="PYTORCH_JIT enabled")
 def test_forward_pass():
     db = DropBlock2D(block_size=3, drop_prob=0.1)
     block_mask = torch.tensor([[[0., 0., 0., 1., 1., 1., 1.],

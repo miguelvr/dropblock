@@ -1,7 +1,10 @@
-import torch
-from dropblock import DropBlock3D
+import os
 from unittest import mock
+
 import pytest
+import torch
+
+from dropblock import DropBlock3D
 
 
 # noinspection PyCallingNonCallable
@@ -123,6 +126,7 @@ def test_block_mask_cube_odd():
 
 
 # noinspection PyCallingNonCallable
+@pytest.mark.skipif(os.environ.get('PYTORCH_JIT', '1') == '1', reason="PYTORCH_JIT enabled")
 def test_forward_pass():
     db = DropBlock3D(block_size=3, drop_prob=0.1)
     block_mask = torch.tensor([[[[1., 1., 1., 1., 1., 1., 1.],
