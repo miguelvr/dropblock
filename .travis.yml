@@ -13,7 +13,7 @@ jobs:
   - stage: quality-assurance
     python: '3.6'
     before_install:
-    - pip install pytest pytest-cov
+    - pip install pytest==4.3.0 pytest-cov
     install:
     - python setup.py install
     script:
