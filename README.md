@@ -1,6 +1,7 @@
 # DropBlock
 
 ![build](https://travis-ci.org/miguelvr/dropblock.png?branch=master)
+[![Downloads](https://pepy.tech/badge/dropblock)](https://pepy.tech/project/dropblock)
 
 
 Implementation of [DropBlock: A regularization method for convolutional networks](https://arxiv.org/pdf/1810.12890.pdf) 
