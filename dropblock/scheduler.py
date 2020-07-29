@@ -7,7 +7,7 @@ class LinearScheduler(nn.Module):
         super(LinearScheduler, self).__init__()
         self.dropblock = dropblock
         self.i = 0
-        self.drop_values = np.linspace(start=start_value, stop=stop_value, num=nr_steps)
+        self.drop_values = np.linspace(start=start_value, stop=stop_value, num=int(nr_steps))
 
     def forward(self, x):
         return self.dropblock(x)
